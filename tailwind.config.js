@@ -3,7 +3,7 @@ module.exports = {
   content: ['app.js', 'views/*.ejs', 'views/partials/*.ejs'],
   theme: {
     container: {
-      center: true
+      center: true,
     },
     screens: {
       'sm': '640px',      

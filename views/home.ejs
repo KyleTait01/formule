@@ -1,5 +1,82 @@
 <%- include('./partials/header.ejs') %>
+<%- include('./partials/nav.ejs') %>
 
+<div class="container text-center py-16">
+    <table class="mx-auto mt-12">
+        <thead>
+            <tr>
+                <th>Pos</th>
+                <th>Driver</th>
+                <th>Constructor</th>
+                <th>Laps</th>
+                <th>Time/Retired</th>
+                <th>Grid</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Charles Leclerc</td>
+                <td>Ferrari</td>
+                <td>71</td>
+                <td>1:24:24.312</td>
+                <td>2</td>
+                <td>25</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Max Verstappen</td>
+                <td>Red Bull Racing</td>
+                <td>71</td>
+                <td>+1.532</td>
+                <td>1</td>
+                <td>19</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Lewis Hamilton</td>
+                <td>Mercedes</td>
+                <td>71</td>
+                <td>+41.217</td>
+                <td>8</td>
+                <td>15</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>George Russell</td>
+                <td>Mercedes</td>
+                <td>71</td>
+                <td>+58.972</td>
+                <td>4</td>
+                <td>12</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Esteban Ocon</td>
+                <td>Alpine</td>
+                <td>71</td>
+                <td>+1:08.436</td>
+                <td>6</td>
+                <td>10</td>
+            </tr>
+        </tbody>
+    </table>
 
+    <div class="flex justify-center items-center gap-x-4 mt-4">
+        <select id="grand_prix_sel" name="grand_prix" class="w-full">
+            <option>Australian Grand Prix</option>
+            <option>Austrian Grand Prix</option>
+            <option>Bahrain Grand Prix</option>
+            <option>San Marino Grand Prix</option>
+        </select>
+        <select id="year_sel" name="year">
+            <% for (var i = 2024; i >= 1950; i--){ %>
+                <option><%= i %></option>
+            <% } %>
+        </select>
+        <button id="submit_btn" name="submit" class="btn btn-submit">Submit</button>
+    </div>
+</div>
 
 <%- include('./partials/footer.ejs') %>
