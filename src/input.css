@@ -5,7 +5,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;500;600;700&display=swap");
 
 body {
-  	@apply font-sans bg-[#141414] text-white;
+  	@apply font-sans bg-[#202020] text-white;
 }
 
 .container {
