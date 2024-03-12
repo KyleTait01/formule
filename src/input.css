@@ -36,3 +36,28 @@ table {
 select {
 	@apply bg-gray-600 text-white px-3 py-2;
 }
+
+.history {
+	@apply w-2/3 mx-auto;
+}
+.guess {
+	@apply grid grid-cols-3 gap-x-4 items-center justify-center;
+}
+.guess:not(:first-of-type) {
+	@apply border-t border-gray-600 pt-2 mt-2;
+}
+.gp-guess, .year-guess {
+	@apply px-3 py-2 text-center;
+}
+.gp-guess {
+	@apply col-span-2;
+}
+.correct-guess {
+	@apply bg-green-700;
+}
+.close-guess {
+	@apply bg-yellow-500;
+}
+.wrong-guess {
+	@apply bg-red-700;
+}
