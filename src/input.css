@@ -52,6 +52,9 @@ select {
 .gp-guess {
 	@apply col-span-2;
 }
+.year-guess {
+	@apply flex items-center justify-center;
+}
 .correct-guess {
 	@apply bg-green-700;
 }
