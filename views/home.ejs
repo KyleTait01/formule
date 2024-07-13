@@ -108,7 +108,7 @@ submitBtn.addEventListener('click', function() {
     const yearGuessBoxes = document.getElementsByClassName('year-guess');
 
     gp_data.data.forEach((gp) => {
-        if (gp[0] == '<%= formatted_gp_name %>'){
+        if (gp[0] == grandPrixGuess){
             chosen_gp_continent = gp[1];
         }
     })
@@ -119,7 +119,7 @@ submitBtn.addEventListener('click', function() {
 
             if (grandPrixGuess.toLowerCase() === grandPrix.toLowerCase()) {
                 grandPrixGuessBoxes[i].classList.add('correct-guess');
-            } else if (chosen_gp_continent = '<%= gp_continent %>'){
+            } else if (chosen_gp_continent === '<%= gp_continent %>'){
                 grandPrixGuessBoxes[i].classList.add('partial-guess');
             } else {
                 grandPrixGuessBoxes[i].classList.add('wrong-guess');
