@@ -9,7 +9,6 @@
         <% } %>
     <% }) %>
     <div class="border-t border-gray-600 mt-4 pt-2 flex justify-center items-center gap-x-4">
-        <a href="https://www.youtube.com/watch?v=G_8mOQeSa2U" target="_blank" class="text-red-600"><%- include('../dist/youtube.svg') %></a>
-        <a href="https://en.wikipedia.org/wiki/2022_Austrian_Grand_Prix" target="_blank">Wikipedia</a>
+        <a href="https://en.wikipedia.org/wiki/<%= chosen_gp.split('-').map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)).join('_').replace('grand', 'Grand');%>" class="hover:underline" target="_blank">Wikipedia</a>
     </div>
 </div>

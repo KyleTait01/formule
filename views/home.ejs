@@ -1,7 +1,15 @@
 <%- include('./partials/header.ejs') %>
 <%- include('./partials/nav.ejs') %>
 
-<% formatted_gp_name = chosen_gp.split('-').slice(1).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ').replace('grand', 'Grand'); %>
+<% formatted_gp_name = sheetName.split('-').slice(1).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ').replace('grand', 'Grand'); %>
+
+<% console.log(gp_data) %>
+
+<% gp_data.data.forEach((gp) => { %>
+    <% if (gp[0] == formatted_gp_name){ %>
+        <% gp_continent = gp[1] %>
+    <% } %>
+<% }) %>
 
 <div id="game_screen" class="container text-center py-16">
     <table class="mx-auto mt-12">
@@ -51,3 +59,124 @@
 <%- include('./partials/footer.ejs') %>
 
 <script>console.log('<%= sheetName %>')</script>
+
+<script>
+const gameScreen = document.getElementById('game_screen');
+const grandPrixSel = document.getElementById('grand_prix_sel');
+const yearSel = document.getElementById('year_sel');
+const submitBtn = document.getElementById('submit_btn');
+var guessHistory = document.getElementById('guess_history');
+let gameWon = false;
+
+let grandPrix = '';
+let year = 0;
+let sheetName = '';
+
+const gp_data = JSON.parse('<%- JSON.stringify(gp_data) %>');
+
+async function getChosenGrandPrix() {
+    try {
+        const response = await fetch('/get-chosen-grand-prix');
+        const data = await response.json();
+        
+        const { randomSheetName } = data;
+        sheetName = randomSheetName;
+
+        const [sheetYear, ...gpNameParts] = randomSheetName.split('-');
+        year = sheetYear;
+        grandPrix = gpNameParts.join(' ').replace('grand', 'Grand');
+
+        // Log the sheetName for debugging
+        console.log(`Selected Sheet: ${sheetName}`);
+    } catch (error) {
+        console.error('Error fetching chosen grand prix from session:', error);
+    }
+}
+
+// Call the getChosenGrandPrix function on page load
+document.addEventListener('DOMContentLoaded', () => {
+    getChosenGrandPrix();
+});
+
+submitBtn.addEventListener('click', function() {
+    const grandPrixGuess = grandPrixSel.value.trim();
+    const yearGuess = yearSel.value.trim();
+
+    guessHistory.innerHTML += '<div class="guess"><h4 class="gp-guess"></h4><h4 class="year-guess"></h4></div>';
+
+    const grandPrixGuessBoxes = document.getElementsByClassName('gp-guess');
+    const yearGuessBoxes = document.getElementsByClassName('year-guess');
+
+    gp_data.data.forEach((gp) => {
+        if (gp[0] == '<%= formatted_gp_name %>'){
+            chosen_gp_continent = gp[1];
+        }
+    })
+
+    for (let i = 0; i < grandPrixGuessBoxes.length; i++) {
+        if (grandPrixGuessBoxes[i].innerHTML === '') {
+            grandPrixGuessBoxes[i].innerHTML = grandPrixGuess;
+
+            if (grandPrixGuess.toLowerCase() === grandPrix.toLowerCase()) {
+                grandPrixGuessBoxes[i].classList.add('correct-guess');
+            } else if (chosen_gp_continent = '<%= gp_continent %>'){
+                grandPrixGuessBoxes[i].classList.add('partial-guess');
+            } else {
+                grandPrixGuessBoxes[i].classList.add('wrong-guess');
+            }
+            break;
+        }
+    }
+
+    for (let i = 0; i < yearGuessBoxes.length; i++) {
+        if (yearGuessBoxes[i].innerHTML === '') {
+            yearGuessBoxes[i].innerHTML = yearGuess;
+            if (yearGuess > year){
+                yearGuessBoxes[i].innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+            } else if (yearGuess < year){
+                yearGuessBoxes[i].innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-up"><polyline points="18 15 12 9 6 15"></polyline></svg>';
+            }
+
+            if (yearGuess == year) {
+                yearGuessBoxes[i].classList.add('correct-guess');
+            } else if (withinRange(year, yearGuess)) {
+                yearGuessBoxes[i].classList.add('close-guess');
+            } else {
+                yearGuessBoxes[i].classList.add('wrong-guess');
+            }
+            break;
+        }
+    }
+
+    if (grandPrixGuess.toLowerCase() === grandPrix.toLowerCase() && yearGuess == year) {
+        grandPrixSel.disabled = true;
+        yearSel.disabled = true;
+        submitBtn.disabled = true;
+        gameWon = true;
+
+        fetch('/set-game-won', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ gameWon: true }),
+        })
+        .then(response => {
+            if (response.ok) {
+                fetch('/win-screen')
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const winScreenContent = parser.parseFromString(html, 'text/html');
+                    gameScreen.appendChild(winScreenContent.body.firstChild);
+                });
+            }
+        });
+    }
+});
+
+function withinRange(x, y) {
+    return Math.abs(x - y) <= 3;
+}
+
+</script>

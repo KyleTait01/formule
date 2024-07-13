@@ -61,6 +61,9 @@ select {
 .close-guess {
 	@apply bg-yellow-500;
 }
+.partial-guess {
+	@apply bg-orange-500;
+}
 .wrong-guess {
 	@apply bg-red-700;
 }

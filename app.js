@@ -73,7 +73,7 @@ app.get("/", async (req, res) => {
 		req.session.gp_data = gp_data;
 	
 		// Render the EJS template and pass the lines as data
-		res.render('home', { lines, sheetName: randomSheetData.sheetName, randomSheetData: randomSheetData.data });
+		res.render('home', { lines, sheetName: randomSheetData.sheetName, randomSheetData: randomSheetData.data, gp_data: gp_data });
 	} catch (err) {
 		console.error('Error reading file:', err);
 		res.status(500).send('Error reading file');
