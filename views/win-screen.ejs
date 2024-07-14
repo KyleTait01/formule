@@ -2,7 +2,7 @@
 
 <div id="win_screen" class="mt-16">
     <h2 class="text-3xl">You got it!</h2>
-    <h4 class="mt-4 text-xl"><%= chosen_gp.split('-').map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)).join(' ').replace('grand', 'Grand');%></h4>
+    <h3 class="mt-4 text-xl"><%= chosen_gp.split('-').map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)).join(' ').replace('grand', 'Grand');%></h3>
     <% gp_data.forEach((gp) => { %>
         <% if (gp[0] == formatted_gp_name){ %>
             <img src="<%= gp[2] %>" class="w-1/2 mx-auto mt-4">
