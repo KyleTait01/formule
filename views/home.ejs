@@ -12,6 +12,21 @@
 <% }) %>
 
 <div id="game_screen" class="container text-center py-16">
+    <div class="controls flex items-center gap-x-24 border border-gray-600 py-2 px-4">
+        <div>
+            <h4>Seasons</h4>
+            <h5>1950 - 2024</h5>
+        </div>
+        <div class="mx-auto">
+            <h4>Game Mode</h4>
+            <h5>Infinite</h5>
+        </div>
+        <div>
+            <h4>New Round</h4>
+            <button name="reset_game" class="ml-auto rotate"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-refresh-cw"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg></button>
+        </div>
+    </div>
+
     <table class="mx-auto mt-12">
         <thead>
             <tr>
@@ -53,12 +68,7 @@
     <div id="guess_history" class="history mt-4"></div>
 </div>
 
-<h2>Random Sheet Name:</h2>
-<p><%= sheetName %></p>
-
 <%- include('./partials/footer.ejs') %>
-
-<script>console.log('<%= sheetName %>')</script>
 
 <script>
 const gameScreen = document.getElementById('game_screen');
