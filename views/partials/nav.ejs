@@ -46,8 +46,8 @@
                 <div class="year-slider"></div>
             </div>
             <div class="range-input">
-                <input type="range" class="min-range" min="1950" max="2024" step="1" value="1950">
-                <input type="range" class="max-range" min="1950" max="2024" step="1" value="2024">
+                <input id="min_range_input" type="range" class="min-range" min="1950" max="2024" step="1" value="1950">
+                <input id="max_range_input" type="range" class="max-range" min="1950" max="2024" step="1" value="2024">
             </div>
             <div class="year-input flex mt-2">
                 <label class="min-year">1950</label>
@@ -87,7 +87,6 @@
         })
     })
 
-    const rangevalue = document.querySelector(".slider-container .year-slider"); 
     const rangeInputvalue = document.querySelectorAll(".range-input input"); 
     const minLabel = document.querySelector(".year-input .min-year");
     const maxLabel = document.querySelector(".year-input .max-year");
@@ -99,6 +98,8 @@
             } else {
                 maxLabel.innerHTML = rangeInput.value;
             }
+
+            yearsLabel.textContent = minLabel.innerHTML + " - " + maxLabel.innerHTML;
         })
     })
 </script>

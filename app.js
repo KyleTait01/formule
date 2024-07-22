@@ -2,9 +2,13 @@ const express = require('express');
 const session = require('express-session');
 const fs = require('fs');
 const xlsx = require('xlsx')
+const bodyParser = require('body-parser');
 
 const app = express();
 app.set("view engine", "ejs");
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }))
 
 // Function to read lines from a file
 function readLinesFromFile(filePath) {
@@ -22,10 +26,20 @@ function readLinesFromFile(filePath) {
 }
 
 // Function to read a random sheet from an Excel file and return an object with sheet name and data
-function readRandomSheetFromExcel(filePath, session) {
+function readRandomSheetFromExcel(filePath, session, minYear, maxYear) {
     const workbook = xlsx.readFile(filePath);
     const sheetNames = workbook.SheetNames;
-    const randomSheetName = sheetNames[Math.floor(Math.random() * sheetNames.length)];
+
+    const filteredSheetNames = sheetNames.filter(sheetName => {
+        const year = parseInt(sheetName.split('-')[0], 10);
+        return year >= minYear && year <= maxYear;
+    });
+
+    if (filteredSheetNames.length === 0){
+        throw new Error('No sheets available within specified range');
+    }
+
+    const randomSheetName = filteredSheetNames[Math.floor(Math.random() * filteredSheetNames.length)];
     const sheet = workbook.Sheets[randomSheetName];
     const jsonData = xlsx.utils.sheet_to_json(sheet, { header: 1 });
 
@@ -34,6 +48,19 @@ function readRandomSheetFromExcel(filePath, session) {
 		session.randomSheetData = jsonData;
 		session.randomSheetName = randomSheetName;
 	}
+
+    return {
+        sheetName: randomSheetName,
+        data: jsonData
+    };
+}
+
+function readRandomSheetFromExcel2(filePath) {
+    const workbook = xlsx.readFile(filePath);
+    const sheetNames = workbook.SheetNames;
+    const randomSheetName = sheetNames[Math.floor(Math.random() * sheetNames.length)];
+    const sheet = workbook.Sheets[randomSheetName];
+    const jsonData = xlsx.utils.sheet_to_json(sheet, { header: 1 });
 
     return {
         sheetName: randomSheetName,
@@ -65,10 +92,10 @@ app.get("/", async (req, res) => {
 		const lines = await readLinesFromFile(filePath);
 
 		const excelFilePath = __dirname + '/all_race_results_2.xlsx';
-        const randomSheetData = readRandomSheetFromExcel(excelFilePath, req.session);
+        const randomSheetData = readRandomSheetFromExcel(excelFilePath, req.session, 1950, 2024);
 
 		const gp_data_filepath = __dirname + '/gp_data.xlsx';
-		const gp_data = readRandomSheetFromExcel(gp_data_filepath)
+		const gp_data = readRandomSheetFromExcel2(gp_data_filepath)
 
 		req.session.gp_data = gp_data;
 	
@@ -79,6 +106,29 @@ app.get("/", async (req, res) => {
 		res.status(500).send('Error reading file');
 	}
 });
+
+app.post('/load-random-gp', async (req, res) => {
+    const { minYear, maxYear } = req.body;
+
+    const filePath = __dirname + '/dist/grands-prix.txt';
+    const lines = await readLinesFromFile(filePath);
+
+    const excelFilePath = __dirname + '/all_race_results_2.xlsx';
+    const randomSheetData = readRandomSheetFromExcel(excelFilePath, req.session, minYear, maxYear);
+
+    const gp_data_filepath = __dirname + '/gp_data.xlsx';
+    const gp_data = readRandomSheetFromExcel2(gp_data_filepath)
+
+    req.session.gp_data = gp_data;
+
+    res.json({
+        lines,
+        sheetName: randomSheetData.sheetName,
+        randomSheetData: randomSheetData.data,
+        gp_data: gp_data
+    });
+})
+
 
 app.get('/win-screen', (req, res) => {
 	const gameWon = req.session.gameWon || false;
