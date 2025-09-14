@@ -121,7 +121,7 @@ function renderHistory(stats, avgNoGuesses) {
     const counts = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0 };
     stats.forEach(num => num >= 6 ? counts[6]++ : counts[num]++);
 
-    const total = stats.length || 1;
+    const total = stats.length || 0;
     let html = `
         <h3 class="mb-4 text-base"><span class="text-lg font-bold">${total}</span> Rounds Played</h3>
         <h4 class="mb-4">Guess Distribution</h4>
