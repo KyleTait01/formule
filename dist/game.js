@@ -128,7 +128,11 @@ function renderHistory(stats, avgNoGuesses) {
     `;
 
     Object.keys(counts).forEach(key => {
-        const percentage = (counts[key] / total) * 100;
+        if (total > 0){
+            const percentage = (counts[key] / total) * 100;
+        } else {
+            const percentage = 0;
+        }
         const label = key >= 6 ? '6+' : key;
 
         html += `
