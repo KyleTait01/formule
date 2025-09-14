@@ -1,6 +1,6 @@
 # Formule
 
-### An Wordle-inspired Formula One guessing game.
+### A Wordle-inspired Formula One guessing game.
 A browser-based guessing game where you must identify the Formula 1 Grand Prix and year from the top 5 standings from the end of the race.
 
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/646b2dd9-b9ca-4a96-93ac-71951f67402a" />
