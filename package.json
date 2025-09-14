@@ -11,5 +11,13 @@
     "fs": "^0.0.1-security",
     "tailwindcss": "^3.4.1",
     "xlsx": "^0.18.5"
-  }
+  },
+  "name": "formule",
+  "description": "",
+  "version": "1.0.0",
+  "main": "app.js",
+  "devDependencies": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

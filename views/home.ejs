@@ -1,16 +1,6 @@
 <%- include('./partials/header.ejs') %>
 <%- include('./partials/nav.ejs') %>
 
-<% console.log('Sheet name: ' + sheetName) %>
-
-<% formatted_gp_name = sheetName.split('-').slice(1).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ').replace('grand', 'Grand'); %>
-
-<% gp_data.data.forEach((gp) => { %>
-    <% if (gp[0] == formatted_gp_name){ %>
-        <% gp_continent = gp[1] %>
-    <% } %>
-<% }) %>
-
 <div id="game_screen" class="container text-center py-16">
     <div class="controls flex items-center gap-x-24 border border-gray-600 py-2 px-4">
         <div>
@@ -27,31 +17,7 @@
         </div>
     </div>
 
-    <table class="mx-auto mt-12">
-        <thead>
-            <tr>
-                <th>Pos</th>
-                <th>Driver</th>
-                <th>Constructor</th>
-                <th>Laps</th>
-                <th>Time/Retired</th>
-                <th>Points</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% randomSheetData.forEach((row, i) => { %>
-                <% if (i < 5){ %>
-                <tr>
-                    <% row.forEach((cell, j) => { %>
-                        <td><%= cell %></td>
-                    <% }); %>
-                </tr>
-                <% } %>
-            <% }); %>
-        </tbody>
-    </table>
-
-    <div class="flex justify-center items-center gap-x-4 mt-4">
+    <div class="flex justify-center items-center gap-x-4 mt-8">
         <select id="grand_prix_sel" name="grand_prix" class="w-full">
             <% lines.forEach(line => { %>
                 <option><%= line %></option>
@@ -65,189 +31,46 @@
         <button id="submit_btn" name="submit" class="btn btn-submit">Submit</button>
     </div>
 
+    <div id="hint" class="absolute left-1/2 transform -translate-x-1/2 mt-2"></div>
+
+    <div id="loader" class="mt-16 hidden"><span class="loader"></span></div>
+
+    <table id="results" class="mx-auto mt-12">
+        <thead>
+            <tr>
+                <th>POSITION</th>
+                <th>DRIVER</th>
+                <th>TEAM</th>
+                <th>LAPS</th>
+                <th>TIME</th>
+                <th>POINTS</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% randomSheetData.forEach((row, i) => { %>
+                <% if (i < 5){ %>
+                <tr>
+                    <% row.forEach((cell, j) => { %>
+                        <% if (j === 1){ %>
+                            <% 
+                                const cleanCell = cell.replace(/\s+/g, ' ').trim();
+                                const parts = cleanCell.split(' ');
+                                
+                                let firstName = parts[0].charAt(0).toUpperCase() + parts[0].slice(1).toLowerCase();
+                                let lastName = parts.slice(1).join(' ').toUpperCase();
+                            %>
+                            <td><%= firstName + (lastName ? ' ' + lastName : '') %></td>
+                        <% } else { %>
+                            <td><%= cell %></td>
+                        <% } %>
+                    <% }); %>
+                </tr>
+                <% } %>
+            <% }); %>
+        </tbody>
+    </table>
+
     <div id="guess_history" class="history mt-4"></div>
 </div>
 
 <%- include('./partials/footer.ejs') %>
-
-<script>
-    const yearsLabel = document.getElementById('years_label');
-    const resetBtn = document.getElementById('reset_btn');
-    const tableBody = document.querySelector('tbody');
-    var guessHistory = document.getElementById('guess_history');
-    const minYearInput = document.getElementById('min_range_input');
-    const maxYearInput = document.getElementById('max_range_input');
-
-    resetBtn.addEventListener('click', function(){
-        const minYear = parseInt(minYearInput.value, 10);
-        const maxYear = parseInt(maxYearInput.value, 10);
-
-        fetch('/load-random-gp', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ minYear, maxYear })
-        })
-        .then(response => response.json())
-        .then(data => {
-                updateTable(data.randomSheetData)
-                getChosenGrandPrix();
-                guessHistory.innerHTML = '';
-                removeWinScreen();
-        })
-    })
-
-    function updateTable(data) {
-        // Clear existing table body
-        tableBody.innerHTML = '';
-
-        // Populate table with new data
-        data.forEach((row, i) => {
-            if (i < 5) {
-                const tr = document.createElement('tr');
-                row.forEach(cell => {
-                    const td = document.createElement('td');
-                    td.textContent = cell;
-                    tr.appendChild(td);
-                });
-                tableBody.appendChild(tr);
-            }
-        });
-    }
-
-    function removeWinScreen() {
-        const winScreen = document.getElementById('win_screen');
-        if (winScreen) {
-            winScreen.remove();
-        }
-
-        const grandPrixSel = document.getElementById('grand_prix_sel');
-        const yearSel = document.getElementById('year_sel');
-        const submitBtn = document.getElementById('submit_btn');
-        grandPrixSel.disabled = false;
-        yearSel.disabled = false;
-        submitBtn.disabled = false;
-
-        grandPrixSel.selectedIndex = 0;
-        yearSel.selectedIndex = 0;
-    }
-</script>
-
-<script>
-const gameScreen = document.getElementById('game_screen');
-const grandPrixSel = document.getElementById('grand_prix_sel');
-const yearSel = document.getElementById('year_sel');
-const submitBtn = document.getElementById('submit_btn');
-var guessHistory = document.getElementById('guess_history');
-let gameWon = false;
-
-let grandPrix = '';
-let year = 0;
-let sheetName = '';
-
-var gp_data = JSON.parse('<%- JSON.stringify(gp_data) %>');
-
-async function getChosenGrandPrix() {
-    try {
-        const response = await fetch('/get-chosen-grand-prix');
-        const data = await response.json();
-        
-        const { randomSheetName } = data;
-        sheetName = randomSheetName;
-
-        const [sheetYear, ...gpNameParts] = randomSheetName.split('-');
-        year = sheetYear;
-        grandPrix = gpNameParts.join(' ').replace('grand', 'Grand');
-    } catch (error) {
-        console.error('Error fetching chosen grand prix from session:', error);
-    }
-}
-
-// Call the getChosenGrandPrix function on page load
-document.addEventListener('DOMContentLoaded', () => {
-    getChosenGrandPrix();
-});
-
-submitBtn.addEventListener('click', function() {
-    const grandPrixGuess = grandPrixSel.value.trim();
-    const yearGuess = yearSel.value.trim();
-
-    guessHistory.innerHTML += '<div class="guess"><h3 class="gp-guess"></h3><h3 class="year-guess"></h3></div>';
-
-    const grandPrixGuessBoxes = document.getElementsByClassName('gp-guess');
-    const yearGuessBoxes = document.getElementsByClassName('year-guess');
-
-    gp_data.data.forEach((gp) => {
-        if (gp[0] == grandPrixGuess){
-            chosen_gp_continent = gp[1];
-        }
-    })
-
-    for (let i = 0; i < grandPrixGuessBoxes.length; i++) {
-        if (grandPrixGuessBoxes[i].innerHTML === '') {
-            grandPrixGuessBoxes[i].innerHTML = grandPrixGuess;
-
-            if (grandPrixGuess.toLowerCase() === grandPrix.toLowerCase()) {
-                grandPrixGuessBoxes[i].classList.add('correct-guess');
-            } else if (chosen_gp_continent === '<%= gp_continent %>'){
-                grandPrixGuessBoxes[i].classList.add('partial-guess');
-            } else {
-                grandPrixGuessBoxes[i].classList.add('wrong-guess');
-            }
-            break;
-        }
-    }
-
-    for (let i = 0; i < yearGuessBoxes.length; i++) {
-        if (yearGuessBoxes[i].innerHTML === '') {
-            yearGuessBoxes[i].innerHTML = yearGuess;
-            if (yearGuess > year){
-                yearGuessBoxes[i].innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>';
-            } else if (yearGuess < year){
-                yearGuessBoxes[i].innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-up"><polyline points="18 15 12 9 6 15"></polyline></svg>';
-            }
-
-            if (yearGuess == year) {
-                yearGuessBoxes[i].classList.add('correct-guess');
-            } else if (withinRange(year, yearGuess)) {
-                yearGuessBoxes[i].classList.add('close-guess');
-            } else {
-                yearGuessBoxes[i].classList.add('wrong-guess');
-            }
-            break;
-        }
-    }
-
-    if (grandPrixGuess.toLowerCase() === grandPrix.toLowerCase() && yearGuess == year) {
-        grandPrixSel.disabled = true;
-        yearSel.disabled = true;
-        submitBtn.disabled = true;
-        gameWon = true;
-
-        fetch('/set-game-won', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ gameWon: true }),
-        })
-        .then(response => {
-            if (response.ok) {
-                fetch('/win-screen')
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const winScreenContent = parser.parseFromString(html, 'text/html');
-                    gameScreen.appendChild(winScreenContent.body.firstChild);
-                });
-            }
-        });
-    }
-});
-
-function withinRange(x, y) {
-    return Math.abs(x - y) <= 3;
-}
-
-</script>

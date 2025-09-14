@@ -73,7 +73,7 @@ else:
 
 print('------------PARSING COMPLETE------------')
 
-with pd.ExcelWriter('all_race_results_2.xlsx') as writer:
+with pd.ExcelWriter('all_race_results.xlsx') as writer:
     for race_name, race_result in zip(race_names, all_race_results):
         df = pd.DataFrame(race_result)
         df.to_excel(writer, sheet_name=race_name, index=False, header=False) 

@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['app.js', 'views/*.ejs', 'views/partials/*.ejs'],
+  content: ['app.js', 'views/*.ejs', 'views/partials/*.ejs', 'dist/*.js'],
   theme: {
     container: {
       center: true,
@@ -14,7 +14,7 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        sans: ['Roboto', 'sans-serif']
+        sans: ['Titillium Web', 'sans-serif']
       },
       colors: {
         'primary': '#2C3E50',
